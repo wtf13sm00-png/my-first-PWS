@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="目標手帳 Pro：每日目標、打卡與反思手帳">
+  <meta name="theme-color" content="#2563eb">
+  <title>目標手帳 Pro</title>
+  <style>
+    :root{
+      --bg:#f4f7fb; --card:#fff; --text:#111827; --muted:#6b7280;
+      --line:#e5e7eb; --primary:#2563eb; --primary-2:#1d4ed8;
+      --success:#10b981; --danger:#ef4444; --tag:#eff6ff;
+      --shadow:0 12px 35px rgba(15,23,42,.08); --radius:22px;
+    }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg:#0b1020; --card:#121a2b; --text:#f3f4f6; --muted:#9ca3af;
+        --line:#243047; --primary:#60a5fa; --primary-2:#3b82f6;
+        --tag:#172554; --shadow:0 14px 38px rgba(0,0,0,.28);
+      }
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+    html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,"Noto Sans TC",sans-serif}
+    body{-webkit-user-select:none;user-select:none;padding-bottom:env(safe-area-inset-bottom)}
+    button{font:inherit;border:0;cursor:pointer;color:inherit}
+    button:active{transform:scale(.96);opacity:.9}
+    input,textarea{font:inherit;font-size:16px;-webkit-user-select:text;user-select:text;touch-action:auto}
+    input,textarea{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--text);
+      border-radius:15px;padding:13px 14px;outline:none}
+    input:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 15%,transparent)}
+    textarea{resize:vertical;min-height:110px}
+    .app{max-width:760px;margin:auto;padding:calc(18px + env(safe-area-inset-top)) 16px 34px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:11px}
+    .logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#2563eb,#60a5fa);
+      display:grid;place-items:center;box-shadow:0 8px 22px rgba(37,99,235,.28)}
+    .logo svg{width:27px;height:27px}
+    h1{font-size:21px;margin:0;font-weight:800;letter-spacing:-.5px}
+    .date{font-size:12px;color:var(--muted);margin-top:2px}
+    .icon-btn{width:42px;height:42px;border-radius:14px;background:var(--card);box-shadow:var(--shadow);
+      display:grid;place-items:center}
+    .icon-btn svg{width:20px;height:20px}
+    .hero{background:var(--card);border:1px solid color-mix(in srgb,var(--line) 70%,transparent);
+      border-radius:var(--radius);padding:19px;box-shadow:var(--shadow);margin-bottom:16px}
+    .hero-row{display:flex;justify-content:space-between;align-items:end;gap:15px}
+    .eyebrow{font-size:13px;color:var(--muted);font-weight:650}
+    .rate{font-size:34px;font-weight:850;letter-spacing:-1.5px;margin-top:3px}
+    .streak{text-align:right}
+    .streak-num{font-size:23px;font-weight:850}
+    .progress{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:15px}
+    .progress > div{height:100%;width:0;background:linear-gradient(90deg,var(--primary),#60a5fa);border-radius:99px;transition:width .35s ease}
+    .section-head{display:flex;align-items:center;justify-content:space-between;margin:24px 2px 10px}
+    .section-head h2{font-size:17px;margin:0}
+    .add{background:var(--primary);color:#fff;border-radius:14px;padding:10px 14px;font-weight:750;box-shadow:0 8px 20px rgba(37,99,235,.2)}
+    .cards{display:grid;gap:11px}
+    .goal{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid color-mix(in srgb,var(--line) 70%,transparent);
+      border-radius:19px;padding:14px;box-shadow:0 6px 22px rgba(15,23,42,.045);transition:.2s}
+    .goal.done{opacity:.72}
+    .check{flex:0 0 48px;width:48px;height:48px;border-radius:16px;background:var(--bg);border:2px solid var(--line);
+      display:grid;place-items:center;color:transparent;transition:.2s}
+    .goal.done .check{background:var(--success);border-color:var(--success);color:#fff}
+    .check svg{width:23px;height:23px}
+    .goal-main{min-width:0;flex:1}
+    .goal-name{font-size:16px;font-weight:760;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .goal.done .goal-name{text-decoration:line-through}
+    .tag{display:inline-block;font-size:11px;color:var(--primary);background:var(--tag);padding:4px 8px;border-radius:999px;margin-top:6px}
+    .delete{width:36px;height:36px;border-radius:12px;background:transparent;color:var(--muted);display:grid;place-items:center}
+    .delete svg{width:18px;height:18px}
+    .empty{background:var(--card);border:1px dashed var(--line);border-radius:20px;padding:30px 18px;text-align:center;color:var(--muted)}
+    .empty strong{display:block;color:var(--text);margin-bottom:5px}
+    .reflection{background:var(--card);border-radius:var(--radius);padding:17px;box-shadow:var(--shadow);margin-top:16px}
+    .reflection h2{font-size:17px;margin:0 0 10px}
+    .save-note{margin-top:10px;width:100%;background:var(--text);color:var(--card);border-radius:14px;padding:12px;font-weight:750}
+    .history{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:12px}
+    .day{aspect-ratio:1;border-radius:12px;background:var(--line);display:grid;place-items:center;font-size:10px;color:var(--muted)}
+    .day.hit{background:var(--success);color:#fff}
+    .day.today{outline:2px solid var(--primary);outline-offset:2px}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.46);display:none;align-items:flex-end;justify-content:center;padding:12px;z-index:10}
+    .modal-backdrop.open{display:flex}
+    .modal{width:min(760px,100%);background:var(--card);border-radius:25px;padding:20px;box-shadow:0 25px 70px rgba(0,0,0,.25);
+      animation:up .2s ease}
+    @keyframes up{from{transform:translateY(25px);opacity:.5}to{transform:none;opacity:1}}
+    .modal h2{margin:0 0 15px;font-size:20px}
+    .field{margin-bottom:12px}.field label{display:block;font-size:13px;color:var(--muted);margin:0 0 6px;font-weight:650}
+    .modal-actions{display:flex;gap:9px;margin-top:15px}
+    .modal-actions button{flex:1;padding:13px;border-radius:14px;font-weight:750}
+    .cancel{background:var(--bg)}.confirm{background:var(--primary);color:#fff}
+    .toast{position:fixed;left:50%;bottom:25px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;
+      background:#111827;color:#fff;padding:11px 15px;border-radius:999px;font-size:13px;transition:.25s;z-index:20}
+    .toast.show{opacity:1;transform:translateX(-50%)}
+    .footer{text-align:center;color:var(--muted);font-size:11px;margin-top:24px}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none"><path d="M7 16.5 13.2 23 26 9" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div><h1>目標手帳 Pro</h1><div class="date" id="todayLabel"></div></div>
+    </div>
+    <button class="icon-btn" id="clearBtn" aria-label="清除所有資料" title="清除所有資料">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M9 6V4h6v2m-8 0 1 15h6l1-15M10 10v7m4-7v7"/></svg>
+    </button>
+  </header>
+
+  <section class="hero">
+    <div class="hero-row">
+      <div><div class="eyebrow">今日達成率</div><div class="rate" id="rate">0%</div></div>
+      <div class="streak"><div class="eyebrow">連續打卡</div><div class="streak-num" id="streak">0 天</div></div>
+    </div>
+    <div class="progress"><div id="progress"></div></div>
+  </section>
+
+  <div class="section-head"><h2>今日目標</h2><button class="add" id="addBtn">＋ 新增目標</button></div>
+  <main class="cards" id="goalList"></main>
+
+  <section class="reflection">
+    <h2>今日反思</h2>
+    <textarea id="note" placeholder="今天做得怎麼樣？寫下一句話也可以。"></textarea>
+    <button class="save-note" id="saveNote">儲存今日反思</button>
+  </section>
+
+  <div class="section-head"><h2>近 7 日紀錄</h2></div>
+  <div class="history" id="history"></div>
+  <div class="footer">資料只儲存在此瀏覽器的 localStorage</div>
+</div>
+
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <h2>新增目標</h2>
+    <div class="field"><label for="goalName">目標名稱</label><input id="goalName" maxlength="60" placeholder="例如：閱讀 30 分鐘"></div>
+    <div class="field"><label for="goalTag">分類標籤</label><input id="goalTag" maxlength="20" placeholder="例如：學習、運動、工作"></div>
+    <div class="modal-actions"><button class="cancel" id="cancelBtn">取消</button><button class="confirm" id="confirmBtn">建立目標</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  const KEY = "goal_tracker_pro_v1";
+  const defaultState = { goals: [], days: {}, notes: {} };
+
+  const $ = id => document.getElementById(id);
+  const today = () => {
+    const d = new Date();
+    const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,"0"), day = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${day}`;
+  };
+  const load = () => {
+    try { return Object.assign({}, defaultState, JSON.parse(localStorage.getItem(KEY) || "{}")); }
+    catch(e){ return {...defaultState}; }
+  };
+  let state = load();
+
+  function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+  function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function uid(){ return Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8); }
+  function toast(msg){
+    const el=$("toast"); el.textContent=msg; el.classList.add("show");
+    clearTimeout(window.__toast); window.__toast=setTimeout(()=>el.classList.remove("show"),1500);
+  }
+
+  function getDayRecord(date){
+    if(!state.days[date]) state.days[date]={};
+    return state.days[date];
+  }
+
+  function todayCompletion(){
+    if(!state.goals.length) return 0;
+    const rec = getDayRecord(today());
+    const done = state.goals.filter(g=>rec[g.id]).length;
+    return Math.round(done/state.goals.length*100);
+  }
+
+  function isDayComplete(date){
+    if(!state.goals.length) return false;
+    const rec = state.days[date] || {};
+    return state.goals.every(g=>!!rec[g.id]);
+  }
+
+  function streak(){
+    let d = new Date();
+    let count=0;
+    while(true){
+      const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+      if(!isDayComplete(key)) break;
+      count++;
+      d.setDate(d.getDate()-1);
+    }
+    return count;
+  }
+
+  function render(){
+    const t=today(), rate=todayCompletion();
+    $("todayLabel").textContent = new Intl.DateTimeFormat("zh-TW",{year:"numeric",month:"long",day:"numeric",weekday:"short"}).format(new Date());
+    $("rate").textContent=rate+"%"; $("progress").style.width=rate+"%"; $("streak").textContent=streak()+" 天";
+
+    const rec=getDayRecord(t), list=$("goalList");
+    if(!state.goals.length){
+      list.innerHTML='<div class="empty"><strong>還沒有今日目標</strong>按右上角「新增目標」開始建立你的第一個目標。</div>';
+    }else{
+      list.innerHTML=state.goals.map(g=>`
+        <article class="goal ${rec[g.id]?'done':''}">
+          <button class="check" data-check="${g.id}" aria-label="完成目標">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 4.5 4.5L19 7"/></svg>
+          </button>
+          <div class="goal-main"><div class="goal-name">${esc(g.name)}</div><span class="tag">${esc(g.tag || "一般")}</span></div>
+          <button class="delete" data-delete="${g.id}" aria-label="刪除目標">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M9 6V4h6v2m-8 0 1 15h6l1-15"/></svg>
+          </button>
+        </article>`).join("");
+    }
+
+    $("note").value=state.notes[t] || "";
+    renderHistory();
+  }
+
+  function renderHistory(){
+    const el=$("history"), arr=[];
+    for(let i=6;i>=0;i--){
+      const d=new Date(); d.setDate(d.getDate()-i);
+      const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+      arr.push({key,label:d.toLocaleDateString("zh-TW",{weekday:"short"}).replace("週",""),hit:isDayComplete(key),today:i===0});
+    }
+    el.innerHTML=arr.map(x=>`<div class="day ${x.hit?'hit':''} ${x.today?'today':''}" title="${x.key}">${x.label}</div>`).join("");
+  }
+
+  $("addBtn").onclick=()=>{ $("modal").classList.add("open"); setTimeout(()=>$("goalName").focus(),80); };
+  $("cancelBtn").onclick=()=>$("modal").classList.remove("open");
+  $("modal").addEventListener("click",e=>{if(e.target===$("modal"))$("modal").classList.remove("open");});
+  $("confirmBtn").onclick=()=>{
+    const name=$("goalName").value.trim(), tag=$("goalTag").value.trim();
+    if(!name){ toast("請輸入目標名稱"); return; }
+    state.goals.push({id:uid(),name,tag});
+    save(); $("goalName").value=""; $("goalTag").value=""; $("modal").classList.remove("open");
+    render(); toast("目標已建立");
+  };
+  $("goalName").addEventListener("keydown",e=>{if(e.key==="Enter")$("confirmBtn").click();});
+
+  $("goalList").addEventListener("click",e=>{
+    const check=e.target.closest("[data-check]"), del=e.target.closest("[data-delete]"), t=today();
+    if(check){
+      const id=check.dataset.check, rec=getDayRecord(t);
+      rec[id]=!rec[id]; save(); render(); toast(rec[id]?"已完成":"已取消");
+    }
+    if(del){
+      const id=del.dataset.delete;
+      state.goals=state.goals.filter(g=>g.id!==id);
+      Object.keys(state.days).forEach(k=>{delete state.days[k][id]});
+      save(); render(); toast("目標已刪除");
+    }
+  });
+
+  $("saveNote").onclick=()=>{
+    state.notes[today()]=$("note").value;
+    save(); toast("今日反思已儲存");
+  };
+
+  $("clearBtn").onclick=()=>{
+    if(confirm("確定要刪除所有目標、打卡紀錄與反思嗎？此操作無法復原。")){
+      localStorage.removeItem(KEY); state=load(); render(); toast("資料已清除");
+    }
+  };
+
+  // Dynamic SVG favicon / manifest
+  const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#2563eb"/><path d="M14 33 25 45 51 18" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const iconUri = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(iconSvg);
+  const favicon=document.createElement("link"); favicon.rel="icon"; favicon.href=iconUri; document.head.appendChild(favicon);
+
+  const manifest={
+    name:"目標手帳 Pro", short_name:"目標手帳", display:"standalone",
+    start_url:"./", background_color:"#ffffff", theme_color:"#2563eb",
+    icons:[{src:iconUri,sizes:"64x64",type:"image/svg+xml",purpose:"any maskable"}]
+  };
+  const manifestBlob=new Blob([JSON.stringify(manifest)],{type:"application/manifest+json"});
+  const manifestLink=document.createElement("link"); manifestLink.rel="manifest";
+  manifestLink.href=URL.createObjectURL(manifestBlob); document.head.appendChild(manifestLink);
+
+  // Best-effort single-file SW. Some browsers require a same-origin real sw.js URL;
+  // the UI and localStorage remain fully functional when SW registration is rejected.
+  if("serviceWorker" in navigator){
+    const swCode = `
+      const CACHE="goal-tracker-pro-v1";
+      self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(["./"])).catch(()=>{}));});
+      self.addEventListener("activate",e=>e.waitUntil(self.clients.claim()));
+      self.addEventListener("fetch",e=>{
+        if(e.request.method!=="GET") return;
+        e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{
+          const copy=res.clone(); caches.open(CACHE).then(c=>c.put(e.request,copy)); return res;
+        }).catch(()=>caches.match("./"))));
+      });
+    `;
+    try{
+      const swBlob=new Blob([swCode],{type:"text/javascript"});
+      const swUrl=URL.createObjectURL(swBlob);
+      navigator.serviceWorker.register(swUrl).catch(()=>{});
+    }catch(e){}
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
